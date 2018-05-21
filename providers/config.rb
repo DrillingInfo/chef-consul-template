@@ -23,7 +23,7 @@ action :create do
   end
 
   # Ensure config directory exists
-  directory node['consul_template']['config_dir'] do
+  directory new_resource.directory do
     unless node['platform'] == 'windows'
       user consul_template_user
       group consul_template_group
@@ -34,14 +34,14 @@ action :create do
   end
 
   if node['platform'] == 'windows'
-    template ::File.join(node['consul_template']['config_dir'], new_resource.name) do
+    template ::File.join(new_resource.directory, new_resource.name) do
       cookbook 'consul-template'
       source 'config-template-win.json.erb'
       variables(:templates => templates)
       not_if { templates.empty? }
     end
   else
-    template ::File.join(node['consul_template']['config_dir'], new_resource.name) do
+    template ::File.join(new_resource.directory, new_resource.name) do
       cookbook 'consul-template'
       source 'config-template.json.erb'
       user consul_template_user
@@ -54,7 +54,7 @@ action :create do
 end
 
 action :delete do
-  file ::File.join(node['consul_template']['config_dir'], new_resource.name) do
+  file ::File.join(new_resource.directory, new_resource.name) do
     action :delete
   end
 end
